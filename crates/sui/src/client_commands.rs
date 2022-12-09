@@ -702,7 +702,7 @@ impl SuiClientCommands {
                 let (address, phrase, scheme) = context
                     .config
                     .keystore
-                    .generate_new_key(key_scheme, derivation_path)?;
+                    .generate_and_add_new_key(key_scheme, derivation_path)?;
                 SuiClientCommandResult::NewAddress((address, phrase, scheme))
             }
             SuiClientCommands::Gas { address } => {
@@ -1280,7 +1280,6 @@ pub async fn call_move(
             gas_budget,
         )
         .await?;
-
     let signature = context
         .config
         .keystore

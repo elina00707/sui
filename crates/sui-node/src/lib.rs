@@ -35,7 +35,6 @@ use sui_network::discovery;
 use sui_network::state_sync;
 use sui_storage::{
     event_store::{EventStoreType, SqlEventStore},
-    node_sync_store::NodeSyncStore,
     IndexStore,
 };
 use sui_types::messages::{CertifiedTransaction, CertifiedTransactionEffects};
@@ -166,17 +165,10 @@ impl SuiNode {
             None
         };
 
-        let node_sync_store = Arc::new(NodeSyncStore::open_tables_read_write(
-            config.db_path().join("node_sync_db"),
-            None,
-            None,
-        ));
-
         let state = AuthorityState::new(
             config.protocol_public_key(),
             secret,
             store,
-            node_sync_store,
             committee_store.clone(),
             index_store.clone(),
             event_store,

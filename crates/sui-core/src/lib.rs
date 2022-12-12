@@ -29,7 +29,6 @@ mod consensus_handler;
 mod execution_driver;
 mod histogram;
 mod module_cache_gauge;
-mod node_sync;
 mod notify_once;
 mod query_helpers;
 mod stake_aggregator;

@@ -160,7 +160,7 @@ pub struct AuthorityMetrics {
     commit_certificate_latency: Histogram,
     handle_transaction_latency: Histogram,
     handle_certificate_latency: Histogram,
-    handle_node_sync_certificate_latency: Histogram,
+    handle_certificate_with_effects_latency: Histogram,
 
     pub(crate) transaction_manager_num_missing_objects: IntGauge,
     pub(crate) transaction_manager_num_pending_certificates: IntGauge,
@@ -312,6 +312,13 @@ impl AuthorityMetrics {
                 registry,
             )
             .unwrap(),
+            handle_certificate_with_effects_latency: register_histogram_with_registry!(
+                "fullnode_handle_certificate_with_effects_latency",
+                "Latency of certificate execution from checkpoint sync.",
+                LATENCY_SEC_BUCKETS.to_vec(),
+                registry,
+            )
+            .unwrap(),
             transaction_manager_num_missing_objects: register_int_gauge_with_registry!(
                 "transaction_manager_num_missing_objects",
                 "Current number of missing objects in TransactionManager",
@@ -387,6 +394,13 @@ impl AuthorityMetrics {
             follower_txes_streamed: register_int_counter_with_registry!(
                 "follower_txes_streamed",
                 "Number of transactions streamed to followers",
+                registry,
+            )
+            .unwrap(),
+            follower_start_seq_num: register_histogram_with_registry!(
+                "follower_start_seq_num",
+                "The start seq number this validator receives from fullnodes node_sync/follower process",
+                follower_seq_num_buckets,
                 registry,
             )
             .unwrap(),
@@ -666,7 +680,7 @@ impl AuthorityState {
     ) -> SuiResult {
         let _metrics_guard = self
             .metrics
-            .handle_node_sync_certificate_latency
+            .handle_certificate_with_effects_latency
             .start_timer();
         let digest = *certificate.digest();
         debug!(tx_digest = ?digest, "execute_certificate_with_effects");
@@ -1483,7 +1497,6 @@ impl AuthorityState {
         name: AuthorityName,
         secret: StableSyncAuthoritySigner,
         store: Arc<AuthorityStore>,
-        node_sync_store: Arc<NodeSyncStore>,
         committee_store: Arc<CommitteeStore>,
         indexes: Option<Arc<IndexStore>>,
         event_store: Option<Arc<EventStoreType>>,
@@ -1515,7 +1528,6 @@ impl AuthorityState {
             _native_functions: native_functions,
             move_vm,
             database: store.clone(),
-            node_sync_store,
             indexes,
             // `module_cache` uses a separate in-mem cache from `event_handler`
             // this is because they largely deal with different types of MoveStructs
@@ -1595,18 +1607,11 @@ impl AuthorityState {
             None,
         ));
 
-        let node_sync_store = Arc::new(NodeSyncStore::open_tables_read_write(
-            path.join("node_sync_db"),
-            None,
-            None,
-        ));
-
         // add the object_basics module
         AuthorityState::new(
             secret.public().into(),
             secret.clone(),
             store,
-            node_sync_store,
             epochs,
             None,
             None,
@@ -1619,8 +1624,6 @@ impl AuthorityState {
     /// Adds certificates to the pending certificate store and transaction manager for ordered execution.
     /// Currently, only used in tests and deprecated callsites.
     pub async fn add_pending_certificates(&self, certs: Vec<VerifiedCertificate>) -> SuiResult<()> {
-        self.node_sync_store
-            .batch_store_certs(certs.iter().cloned())?;
         self.epoch_store().insert_pending_certificates(&certs)?;
         self.transaction_manager.enqueue(certs).await
     }

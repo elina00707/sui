@@ -284,6 +284,7 @@ impl SuiNode {
         // TODO only configure validators as seed/preferred peers for validators and not for
         // fullnodes once we've had a chance to re-work fullnode configuration generation.
         let mut p2p_config = config.p2p_config.clone();
+        println!("{:#?}", p2p_config);
         let our_network_public_key = config.network_key_pair.public();
         let other_validators = config
             .genesis()?

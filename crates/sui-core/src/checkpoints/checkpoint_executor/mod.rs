@@ -39,7 +39,7 @@ use tokio::{
     task::JoinHandle,
 };
 use tokio_stream::StreamExt;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 use typed_store::{rocks::TypedStoreError, Map};
 
 use crate::{
@@ -189,7 +189,10 @@ impl CheckpointExecutor {
                 }
                 // Check for newly synced checkpoints from StateSync.
                 received = self.mailbox.recv() => match received {
-                    Ok(checkpoint) => self.latest_synced_checkpoint = Some(checkpoint),
+                    Ok(checkpoint) => {
+                        debug!(seq = ?checkpoint.summary.sequence_number, "notified of new checkpoint");
+                        self.latest_synced_checkpoint = Some(checkpoint);
+                    }
                     // In this case, messages in the mailbox have been overwritten
                     // as a result of lagging too far behind. In this case, we need to
                     // nullify self.latest_synced_checkpoint as the latest synced needs to

@@ -814,6 +814,7 @@ async fn sync_checkpoint_contents<S>(
                     .expect("store operation should not fail");
                 metrics.set_highest_synced_checkpoint(checkpoint.sequence_number());
                 // We don't care if no one is listening as this is a broadcast channel
+                debug!("sending ckpt notification");
                 let _ = checkpoint_event_sender.send(checkpoint.clone());
                 highest_synced = Some(checkpoint);
             }

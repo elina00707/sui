@@ -49,7 +49,6 @@ use sui_simulator::nondeterministic;
 use sui_storage::write_ahead_log::WriteAheadLog;
 use sui_storage::{
     event_store::{EventStore, EventStoreType, StoredEvent},
-    node_sync_store::NodeSyncStore,
     write_ahead_log::{DBTxGuard, TxGuard},
     IndexStore,
 };
@@ -313,13 +312,6 @@ impl AuthorityMetrics {
                 registry,
             )
             .unwrap(),
-            handle_node_sync_certificate_latency: register_histogram_with_registry!(
-                "fullnode_handle_node_sync_certificate_latency",
-                "Latency of fullnode handling certificate from node sync",
-                LATENCY_SEC_BUCKETS.to_vec(),
-                registry,
-            )
-            .unwrap(),
             transaction_manager_num_missing_objects: register_int_gauge_with_registry!(
                 "transaction_manager_num_missing_objects",
                 "Current number of missing objects in TransactionManager",
@@ -395,13 +387,6 @@ impl AuthorityMetrics {
             follower_txes_streamed: register_int_counter_with_registry!(
                 "follower_txes_streamed",
                 "Number of transactions streamed to followers",
-                registry,
-            )
-            .unwrap(),
-            follower_start_seq_num: register_histogram_with_registry!(
-                "follower_start_seq_num",
-                "The start seq number this validator receives from fullnodes node_sync/follower process",
-                follower_seq_num_buckets,
                 registry,
             )
             .unwrap(),
@@ -536,8 +521,6 @@ pub struct AuthorityState {
 
     /// The database
     pub(crate) database: Arc<AuthorityStore>, // TODO: remove pub
-
-    pub node_sync_store: Arc<NodeSyncStore>,
 
     indexes: Option<Arc<IndexStore>>,
 

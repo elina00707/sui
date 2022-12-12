@@ -33,10 +33,7 @@ use arc_swap::ArcSwap;
 use prometheus::Registry;
 use std::{collections::HashMap, sync::Arc, time::Duration};
 use sui_types::{base_types::AuthorityName, error::SuiResult};
-use tokio::{
-    sync::{oneshot, Mutex},
-    task::JoinHandle,
-};
+use tokio::sync::Mutex;
 use tracing::debug;
 
 use crate::{authority::AuthorityState, authority_aggregator::AuthorityAggregator};
@@ -91,8 +88,6 @@ impl AuthorityHealth {
         self.no_contact_before <= now
     }
 }
-
-struct NodeSyncProcessHandle(JoinHandle<()>, oneshot::Sender<()>);
 
 pub struct ActiveAuthority<A> {
     // The local authority state

@@ -76,7 +76,6 @@ pub struct SuiNode {
     _json_rpc_service: Option<ServerHandle>,
     _batch_subsystem_handle: tokio::task::JoinHandle<()>,
     _post_processing_subsystem_handle: Option<tokio::task::JoinHandle<Result<()>>>,
-    _gossip_handle: Option<tokio::task::JoinHandle<()>>,
     state: Arc<AuthorityState>,
     active: Arc<ActiveAuthority<NetworkAuthorityClient>>,
     transaction_orchestrator: Option<Arc<TransactiondOrchestrator<NetworkAuthorityClient>>>,
@@ -199,7 +198,6 @@ impl SuiNode {
             Some(Arc::new(TransactiondOrchestrator::new(
                 arc_net,
                 state.clone(),
-                active_authority.clone().node_sync_handle(),
                 &prometheus_registry,
             )))
         } else {
@@ -229,13 +227,6 @@ impl SuiNode {
                 None
             };
 
-        let gossip_handle = if is_full_node {
-            active_authority.clone().spawn_node_sync_process().await;
-            None
-        } else {
-            None
-        };
-
         let validator_server_info = Self::start_grpc_validator_service(
             config,
             state.clone(),
@@ -258,7 +249,6 @@ impl SuiNode {
             checkpoint_store,
             validator_server_info,
             _json_rpc_service: json_rpc_service,
-            _gossip_handle: gossip_handle,
             _batch_subsystem_handle: batch_subsystem_handle,
             _post_processing_subsystem_handle: post_processing_subsystem_handle,
             state,

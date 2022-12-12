@@ -29,13 +29,8 @@ async fn test_blocking_execution() -> Result<(), anyhow::Error> {
 
     let active = node.active();
 
-    // Disable node sync process
-    active.cancel_node_sync_process_for_tests().await;
-
     let net = active.agg_aggregator();
-    let node_sync_handle = active.clone().node_sync_handle();
-    let orchestrator =
-        TransactiondOrchestrator::new(net, node.state(), node_sync_handle, &Registry::new());
+    let orchestrator = TransactiondOrchestrator::new(net, node.state(), &Registry::new());
 
     let txn_count = 4;
     let mut txns = make_transactions_with_wallet_context(context, txn_count).await;
@@ -89,13 +84,8 @@ async fn test_non_blocking_execution() -> Result<(), anyhow::Error> {
 
     let active = node.active();
 
-    // Disable node sync process
-    active.cancel_node_sync_process_for_tests().await;
-
     let net = active.agg_aggregator();
-    let node_sync_handle = active.clone().node_sync_handle();
-    let orchestrator =
-        TransactiondOrchestrator::new(net, node.state(), node_sync_handle, &Registry::new());
+    let orchestrator = TransactiondOrchestrator::new(net, node.state(), &Registry::new());
 
     let txn_count = 4;
     let mut txns = make_transactions_with_wallet_context(context, txn_count).await;
@@ -156,13 +146,8 @@ async fn test_local_execution_with_missing_parents() -> Result<(), anyhow::Error
 
     let active = node.active();
 
-    // Disable node sync process
-    active.cancel_node_sync_process_for_tests().await;
-
     let net = active.agg_aggregator();
-    let node_sync_handle = active.clone().node_sync_handle();
-    let orchestrator =
-        TransactiondOrchestrator::new(net, node.state(), node_sync_handle, &Registry::new());
+    let orchestrator = TransactiondOrchestrator::new(net, node.state(), &Registry::new());
 
     let signer = context.config.keystore.addresses().get(0).cloned().unwrap();
     let (pkg_ref, counter_id) = publish_basics_package_and_make_counter(context, signer).await;

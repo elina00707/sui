@@ -9,7 +9,6 @@ finalized transactions locally, with the help of Node Sync.
 use prometheus::core::{AtomicI64, AtomicU64, GenericCounter, GenericGauge};
 use std::sync::Arc;
 use std::time::Duration;
-use tokio_stream::StreamExt;
 
 use crate::authority::AuthorityState;
 use crate::authority_aggregator::AuthorityAggregator;
@@ -338,9 +337,6 @@ pub struct TransactionOrchestratorMetrics {
     local_execution_success: GenericCounter<AtomicU64>,
     local_execution_timeout: GenericCounter<AtomicU64>,
     local_execution_failure: GenericCounter<AtomicU64>,
-
-    tx_directly_executed: GenericCounter<AtomicU64>,
-    tx_not_executed: GenericCounter<AtomicU64>,
 }
 
 impl TransactionOrchestratorMetrics {
@@ -426,18 +422,6 @@ impl TransactionOrchestratorMetrics {
             local_execution_failure: register_int_counter_with_registry!(
                 "tx_orchestrator_local_execution_failure",
                 "Total number of failed local execution txns Transaction Orchestrator handles",
-                registry,
-            )
-            .unwrap(),
-            tx_directly_executed: register_int_counter_with_registry!(
-                "tx_orchestrator_tx_directly_executed",
-                "Total number of txns Transaction Orchestrator directly executed",
-                registry,
-            )
-            .unwrap(),
-            tx_not_executed: register_int_counter_with_registry!(
-                "tx_orchestrator_tx_not_executed",
-                "Total number of txns Transaction Orchestrator failed to execute",
                 registry,
             )
             .unwrap(),

@@ -207,13 +207,21 @@ impl<K, V> DBMap<K, V> {
         DBBatch::new(&self.rocksdb, &self.db_metrics, &self.write_sample_interval)
     }
 
-    fn cf(&self) -> Arc<rocksdb::BoundColumnFamily<'_>> {
+    pub fn compact_range<J: Serialize>(&self, start: &J, end: &J) -> Result<(), TypedStoreError> {
+        let from_buf = be_fix_int_ser(start.borrow())?;
+        let to_buf = be_fix_int_ser(end.borrow())?;
+        self.rocksdb
+            .compact_range_cf(&self.cf(), Some(from_buf), Some(to_buf));
+        Ok(())
+    }
+
+    pub fn cf(&self) -> Arc<rocksdb::BoundColumnFamily<'_>> {
         self.rocksdb
             .cf_handle(&self.cf)
             .expect("Map-keying column family should have been checked at DB creation")
     }
 
-    fn get_int_property(
+    pub fn get_int_property(
         rocksdb: &rocksdb::DBWithThreadMode<MultiThreaded>,
         cf: &impl AsColumnFamilyRef,
         property_name: &'static std::ffi::CStr,

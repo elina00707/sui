@@ -318,6 +318,7 @@ miniz_oxide-d8f496e17d97b5cb = { package = "miniz_oxide", version = "0.5", defau
 miniz_oxide-3b31131e45eafb45 = { package = "miniz_oxide", version = "0.6", default-features = false, features = ["with-alloc"] }
 mio-c38e5c1d305a1b54 = { package = "mio", version = "0.8", features = ["net", "os-ext", "os-poll"] }
 mockall = { version = "0.11", default-features = false }
+more-asserts = { version = "0.3", default-features = false }
 move-abigen = { git = "https://github.com/move-language/move", rev = "265e8792ff2935db8246ddb308b36b893d507851", default-features = false }
 move-binary-format = { git = "https://github.com/move-language/move", rev = "265e8792ff2935db8246ddb308b36b893d507851" }
 move-borrow-graph = { git = "https://github.com/move-language/move", rev = "265e8792ff2935db8246ddb308b36b893d507851", default-features = false }

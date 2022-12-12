@@ -1,6 +1,7 @@
 // Copyright (c) Mysten Labs, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
+use crate::node::AuthorityStorePruningConfig;
 use crate::p2p::{P2pConfig, SeedPeer};
 use crate::{builder, genesis, utils, Config, NodeConfig, ValidatorInfo};
 use fastcrypto::traits::KeyPair;
@@ -197,6 +198,7 @@ impl<'a> FullnodeConfigBuilder<'a> {
             grpc_load_shed: None,
             grpc_concurrency_limit: None,
             p2p_config,
+            authority_store_pruning_config: AuthorityStorePruningConfig::fullnode_config(),
         })
     }
 }

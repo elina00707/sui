@@ -119,8 +119,15 @@ impl SuiNode {
 
         let secret = Arc::pin(config.protocol_key_pair().copy());
         let committee = genesis.committee()?;
-        let store =
-            Arc::new(AuthorityStore::open(&config.db_path().join("store"), None, genesis).await?);
+        let store = Arc::new(
+            AuthorityStore::open(
+                &config.db_path().join("store"),
+                None,
+                genesis,
+                &config.authority_store_pruning_config,
+            )
+            .await?,
+        );
         let committee_store = Arc::new(CommitteeStore::new(
             config.db_path().join("epochs"),
             &committee,

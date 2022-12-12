@@ -27,6 +27,7 @@ use std::{
     pin::Pin,
     sync::{atomic::Ordering, Arc},
 };
+use sui_config::node::AuthorityStorePruningConfig;
 use tap::TapFallible;
 use tokio::sync::broadcast::error::RecvError;
 use tokio::sync::mpsc::unbounded_channel;
@@ -127,6 +128,7 @@ mod tbls_tests;
 
 pub mod authority_per_epoch_store;
 
+pub mod authority_store_pruner;
 pub mod authority_store_tables;
 
 pub mod authority_notifier;
@@ -1807,6 +1809,7 @@ impl AuthorityState {
                 None,
                 &genesis_committee,
                 genesis,
+                &AuthorityStorePruningConfig::default(),
             )
             .await
             .unwrap(),

@@ -451,7 +451,7 @@ impl SuiClientCommands {
                 let client = context.get_client().await?;
                 if verify_dependencies {
                     BytecodeSourceVerifier::new(client.read_api(), false)
-                        .verify_package(&compiled_package.package, true, None)
+                        .verify_package_deps(&compiled_package.package)
                         .await?;
                     println!("Successfully verified dependencies on-chain against source.");
                 }
@@ -952,7 +952,7 @@ impl SuiClientCommands {
                         .await
                     {
                         Ok(_) => "Ok".to_string(),
-                        Err(e) => format!("{}", e),
+                        Err(e) => format!("{}", e).red().to_string(),
                     },
                 )
             }

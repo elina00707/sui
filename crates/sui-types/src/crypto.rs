@@ -1509,7 +1509,6 @@ impl SignatureScheme {
             SignatureScheme::BLS12381 => 0x03,
         }
     }
-
     pub fn from_flag(flag: &str) -> Result<SignatureScheme, SuiError> {
         let byte_int = flag
             .parse::<u8>()

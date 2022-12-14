@@ -1218,9 +1218,10 @@ impl AuthorityStore {
     ) -> SuiResult<Option<(u64, Vec<TransactionDigest>)>> {
         let epoch_tables = self.epoch_store();
 
-        let Some((index, from_height_excluded)) = epoch_tables.get_last_checkpoint_boundary() else {
-            return Ok(None);
-        };
+        let (index, from_height_excluded) = epoch_tables
+            .get_last_checkpoint_boundary()
+            .expect("checkpoint boundary table must not be empty");
+
         if from_height_excluded >= to_height_included {
             // Due to crash recovery we might enter this function twice for same boundary
             debug!("Not returning last checkpoint - already processed");
@@ -1247,23 +1248,22 @@ impl AuthorityStore {
     pub fn record_checkpoint_boundary(&self, commit_round: u64) -> SuiResult {
         let epoch_tables = self.epoch_store();
 
-        if let Some((index, height)) = epoch_tables.get_last_checkpoint_boundary() {
-            if height >= commit_round {
-                // Due to crash recovery we might see same boundary twice
-                debug!("Not recording checkpoint boundary - already updated");
-            } else {
-                let index = index + 1;
-                debug!(
-                    "Recording checkpoint boundary {} at {}",
-                    index, commit_round
-                );
-                epoch_tables.insert_checkpoint_boundary(index, commit_round)?;
-            }
+        let (index, height) = epoch_tables
+            .get_last_checkpoint_boundary()
+            .expect("checkpoint boundary table must not be empty");
+
+        if height >= commit_round {
+            // Due to crash recovery we might see same boundary twice
+            debug!("Not recording checkpoint boundary - already updated");
         } else {
-            // Table is empty
-            debug!("Recording first checkpoint boundary at {}", commit_round);
-            epoch_tables.insert_checkpoint_boundary(0, commit_round)?;
+            let index = index + 1;
+            debug!(
+                "Recording checkpoint boundary {} at {}",
+                index, commit_round
+            );
+            epoch_tables.insert_checkpoint_boundary(index, commit_round)?;
         }
+
         Ok(())
     }
 

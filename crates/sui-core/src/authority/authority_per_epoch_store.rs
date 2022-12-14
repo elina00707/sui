@@ -170,7 +170,8 @@ impl AuthorityPerEpochStore {
         let wal_path = parent_path.join("recovery_log");
         let wal = Arc::new(DBWriteAheadLog::new(wal_path));
         let epoch_alive = NotifyOnce::new();
-        Self {
+
+        let this = Self {
             committee,
             tables,
             reconfig_state_mem: RwLock::new(reconfig_state),
@@ -178,7 +179,15 @@ impl AuthorityPerEpochStore {
             consensus_notify_read: NotifyRead::new(),
             end_of_publish: Mutex::new(end_of_publish),
             wal,
+        };
+
+        if this.get_last_checkpoint_boundary().is_none() {
+            debug!("Inserting initial checkpoint boundary into empty table");
+            this.insert_checkpoint_boundary(0, 0)
+                .expect("insert cannot fail");
         }
+
+        this
     }
 
     pub fn wal(

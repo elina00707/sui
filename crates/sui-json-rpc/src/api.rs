@@ -11,9 +11,10 @@ use fastcrypto::encoding::Base64;
 use sui_json::SuiJsonValue;
 use sui_json_rpc_types::{
     Balance, CoinPage, EventPage, GetObjectDataResponse, GetPastObjectDataResponse,
-    GetRawObjectDataResponse, MoveFunctionArgType, RPCTransactionRequestParams, SuiCoinMetadata,
-    SuiEventEnvelope, SuiEventFilter, SuiExecuteTransactionResponse, SuiMoveNormalizedFunction,
-    SuiMoveNormalizedModule, SuiMoveNormalizedStruct, SuiObjectInfo,
+    GetRawObjectDataResponse, MoveFunctionArgType, RPCTransactionRequestParams,
+    SuiCertifiedTransactionEffects, SuiCoinMetadata, SuiEventEnvelope, SuiEventFilter,
+    SuiExecuteTransactionResponse, SuiMoveNormalizedFunction, SuiMoveNormalizedModule,
+    SuiMoveNormalizedStruct, SuiObjectInfo, SuiTBlsSignRandomnessObjectResponse,
     SuiTransactionAuthSignersResponse, SuiTransactionEffects, SuiTransactionFilter,
     SuiTransactionResponse, SuiTypeTag, TransactionBytes, TransactionsPage,
 };
@@ -477,6 +478,22 @@ pub trait EventReadApi {
         /// query result ordering, default to false (ascending order), oldest record first.  
         descending_order: Option<bool>,
     ) -> RpcResult<EventPage>;
+}
+
+#[open_rpc(namespace = "sui", tag = "Threshold BLS APIs")]
+#[rpc(server, client, namespace = "sui")]
+pub trait ThresholdBlsApi {
+    /// Sign an a Randomness object with threshold BLS.
+    #[method(name = "tblsSignRandomnessObject")]
+    fn tbls_sign_randomness_object(
+        &self,
+        /// The object ID.
+        object_id: ObjectID,
+        /// The epoch in which it was created.
+        epoch: EpochId,
+        /// In case the given epoch is the current one, transaction effects certificate for proving that the object was committed.
+        effects: Option<SuiCertifiedTransactionEffects>,
+    ) -> RpcResult<SuiTBlsSignRandomnessObjectResponse>;
 }
 
 #[open_rpc(namespace = "sui", tag = "APIs to execute transactions.")]

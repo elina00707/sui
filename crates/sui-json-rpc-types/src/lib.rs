@@ -12,6 +12,7 @@ use std::str::FromStr;
 
 use colored::Colorize;
 use fastcrypto::encoding::{Base64, Encoding};
+use fastcrypto_tbls;
 use itertools::Itertools;
 use move_binary_format::file_format::{Ability, AbilitySet, StructTypeParameter, Visibility};
 use move_binary_format::normalized::{
@@ -390,6 +391,12 @@ impl Display for SuiParsedTransactionResponse {
             SuiParsedTransactionResponse::SplitCoin(r) => r.fmt(f),
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug, JsonSchema)]
+pub struct SuiTBlsSignRandomnessObjectResponse {
+    #[schemars(with = "Base64")]
+    pub signature: fastcrypto_tbls::types::Signature,
 }
 
 #[allow(clippy::large_enum_variant)]

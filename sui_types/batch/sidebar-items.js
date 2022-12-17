@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["UpdateItem","Either a freshly sequenced transaction/effects tuple of hashes or a batch"]],"struct":[["AuthorityBatch",""],["TransactionBatch",""]],"type":[["BatchDigest",""],["SignedBatch",""],["TxSequenceNumber",""],["VerifiedSignedBatch",""]]};

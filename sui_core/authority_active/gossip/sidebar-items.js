@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["GossipMetrics","See the `new` function for description for each metrics."]]};

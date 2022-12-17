@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["create_fake_cert_and_effect_digest",""],["dummy_transaction_effects",""],["init_local_authorities",""],["init_local_authorities_with_genesis",""],["wait_for_all_txes",""],["wait_for_tx",""]]};

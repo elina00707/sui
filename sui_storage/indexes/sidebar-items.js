@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["IndexStore",""],["IndexStoreConfigurator","Create config structs for configuring DBMap tables"],["IndexStoreReadOnly","Create an intermediate struct used to open the DBMap tables in secondary mode This is only used internally"],["ObjectIndexChanges",""]]};
